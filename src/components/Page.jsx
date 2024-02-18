@@ -1,32 +1,31 @@
 import {
-    useContext,
-    useEffect,
-    experimental_useEffectEvent as useEffectEvent,
+  useContext,
+  useEffect,
+  experimental_useEffectEvent as useEffectEvent,
 } from "react";
 import ShoppingCartContext from "../contexts/shoppingCartContext";
 import logVisit from "../utils/logVisit";
 
-export default function Page({ url, onPageChange, onAddItems }) {
-    const items = useContext(ShoppingCartContext);
-    const numberOfItems = items.length;
+export default function Page({ url, onPageChanged, onAddItems }) {
+  const items = useContext(ShoppingCartContext);
 
-    const onVisit = useEffectEvent((visitedUrl) => {
-        logVisit(visitedUrl, numberOfItems);
-    });
+  const numberOfItems = items.length;
 
-    useEffect(() => {
-        onVisit(url);
-        // logVisit(url, numberOfItems);
-    }, [url]);
+  const onVisit = useEffectEvent((url) => {
+    logVisit(url, numberOfItems);
+  });
 
-    return (
-        <div>
-            <div>This is page</div>
-            <div>
-                <button onClick={onPageChange}>Change page</button>
-                <button onClick={onAddItems}>Add new Item</button>
-            </div>
-            <div>Total items in cart {numberOfItems}</div>
-        </div>
-    );
+  useEffect(() => {
+    onVisit(url);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url]);
+
+  return (
+    <div>
+      <div>This is page</div>
+      <button onClick={onPageChanged}>Change Page</button>
+      <button onClick={onAddItems}>Add New Item</button>
+      <div>Total Cart Items {numberOfItems}</div>
+    </div>
+  );
 }
