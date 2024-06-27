@@ -1,8 +1,11 @@
 function Item({ name, isPacked }) {
+  let itemContent = "";
   if (isPacked) {
-    return <li className="item">{name} ✔</li>;
+    itemContent = <span>{name + " ✔"}</span>;
+  } else {
+    itemContent = name;
   }
-  return <li className="item">{name}</li>;
+  return <li className="item">{itemContent}</li>;
 }
 
 export default function PackingList() {
@@ -12,7 +15,7 @@ export default function PackingList() {
       <ul>
         <Item isPacked={true} name="Space suit" />
         <Item isPacked={true} name="Helmet with a golden leaf" />
-        <Item isPacked={false} name="Photo of Tam" />
+        <Item isPacked={0} name="Photo of Tam" />
       </ul>
     </section>
   );
