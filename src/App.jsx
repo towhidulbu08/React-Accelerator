@@ -1,23 +1,17 @@
-import { Fragment } from "react";
-import { getImageUrl } from "./components/utilis.js";
-import { people } from "./data";
+let guest = 0;
 
-export default function App() {
-  const chemists = people.filter((person) => person.profession === "chemist");
-  const listItems = chemists.map((person) => (
-    <Fragment key={person.id}>
-      <img src={getImageUrl(person)} alt={person.name} />
-      <p>
-        <b>{person.name}:</b>
-        {" " + person.profession + " "}
-        known for {person.accomplishment}
-      </p>
-    </Fragment>
-  ));
-  console.log(listItems);
+function Cup() {
+  // Bad: changing a preexisting variable!
+  guest = guest + 1;
+  return <h2>Tea cup for guest #{guest}</h2>;
+}
+
+export default function TeaSet() {
   return (
-    <div>
-      <ul>{listItems}</ul>;
-    </div>
+    <>
+      <Cup />
+      <Cup />
+      <Cup />
+    </>
   );
 }
