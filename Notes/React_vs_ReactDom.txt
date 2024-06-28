@@ -1,0 +1,20 @@
+=>React and ReactDOM are two different libraries within the React ecosystem, and they serve distinct purposes. Here’s an explanation of each and how they differ:
+
+>i.React:
+React is the core library responsible for defining and managing components. It provides the foundational tools for building UI components and managing state within those components. React includes:
+
+Component API: Allows you to create components using either class components or functional components.
+
+Hooks: Enable you to use state and other React features in functional components (e.g., useState, useEffect).
+
+JSX: A syntax extension that allows you to write HTML-like code within JavaScript.
+
+React itself is platform-agnostic, meaning it doesn't interact directly with the DOM. It can be used to render components in various environments, such as web browsers, mobile apps, and even virtual reality environments, with the help of platform-specific libraries.
+
+>ii.ReactDOM:
+ReactDOM is the library that connects React components to the actual DOM in web applications. It provides the methods to render components to the DOM and manage their updates. Key features of ReactDOM include:
+
+Rendering: ReactDOM.render() is used to render a React component to a specified DOM node.
+Hydration: ReactDOM.hydrate() is used to hydrate a server-rendered markup (typically for server-side rendering).
+Creating Portals: ReactDOM.createPortal() allows you to render components outside the main DOM hierarchy.
+ReactDOM is specifically designed for web applications, providing the necessary tools to interact with the browser’s DOM.
