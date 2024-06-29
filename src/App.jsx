@@ -1,21 +1,13 @@
 export default function App() {
   return (
-    <Toolbar
-      onPlayMovie={() => alert("Playing")}
-      onUploadImage={() => alert("Uploading")}
-    ></Toolbar>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        alert("Submitting!");
+      }}
+    >
+      <input />
+      <button>Send</button>
+    </form>
   );
-}
-
-function Toolbar({ onPlayMovie, onUploadImage }) {
-  return (
-    <div>
-      <Button onSmash={onPlayMovie}>Play Movie</Button>
-      <Button onSmash={onUploadImage}>Upload Image</Button>
-    </div>
-  );
-}
-
-function Button({ onSmash, children }) {
-  return <button onClick={onSmash}>{children}</button>;
 }
