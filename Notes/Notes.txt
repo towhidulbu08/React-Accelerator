@@ -1,0 +1,19 @@
+---> L-2.1:Responding to Events <---
+
+Event handler functions:
+i.Are usually defined inside your components.
+ii.Have names that start with handle, followed by the name of the event.
+By convention, it is common to name event handlers as handle followed by the event name. You’ll often see onClick={handleClick}, onMouseEnter={handleMouseEnter}, and so on.
+
+=>Pitfall:
+Functions passed to event handlers must be passed, not called. For example:
+
+passing a function (correct): <button onClick={handleClick}>
+
+calling a function (incorrect): <button onClick={handleClick()}>
+	
+The difference is subtle. In the first example, the handleClick function is passed as an onClick event handler. This tells React to remember it and only call your function when the user clicks the button.
+
+In the second example, the () at the end of handleClick() fires the function immediately during rendering, without any clicks. This is because JavaScript inside the JSX { and } executes right away.
+
+=>Note:Event handlers are declared inside of a component, they have access to the component’s props.
