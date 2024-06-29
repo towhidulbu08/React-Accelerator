@@ -1,17 +1,21 @@
-let guest = 0;
-
-function Cup() {
-  // Bad: changing a preexisting variable!
-  guest = guest + 1;
-  return <h2>Tea cup for guest #{guest}</h2>;
+export default function App() {
+  return (
+    <Toolbar
+      onPlayMovie={() => alert("Playing")}
+      onUploadImage={() => alert("Uploading")}
+    ></Toolbar>
+  );
 }
 
-export default function TeaSet() {
+function Toolbar({ onPlayMovie, onUploadImage }) {
   return (
-    <>
-      <Cup />
-      <Cup />
-      <Cup />
-    </>
+    <div>
+      <Button onSmash={onPlayMovie}>Play Movie</Button>
+      <Button onSmash={onUploadImage}>Upload Image</Button>
+    </div>
   );
+}
+
+function Button({ onSmash, children }) {
+  return <button onClick={onSmash}>{children}</button>;
 }
