@@ -47,4 +47,25 @@ i.Difference Between Local Variable(Regular Variable) And State Variable:
 Local variables: Re-initialized on every render, do not persist changes between renders.Changes to local variables won’t trigger renders. React doesn’t realize it needs to render the component again with the new data.
 State variables: Persist between renders, changes to state trigger re-renders, and the new state value is retained across renders.
 
-ii. Difference Between props And State 
+ii. Difference Between props And State
+
+
+In React, both props and state are used to control the behavior and appearance of components, but they serve different purposes and have distinct characteristics.
+
+Props:
+i.Passed from Parent to Child: Props are used to pass data from a parent component to a child component.
+
+ii.Read-Only: Props are read-only, meaning that a child component cannot modify its props. They are immutable within the child component.
+
+iii.Controlled by Parent: The parent component controls the values of the props. Any changes to the props must be made in the parent component.
+
+iv.Usage: Props are used to pass data and event handlers to child components. They enable communication between components in a React application.
+
+State:
+i.Private to the Component: State is managed within a component and is fully private to that component. It is not accessible directly by parent or sibling components.
+
+ii.Mutable: State is mutable, meaning that it can be changed within the component using the setState function (or useState hook in functional components).
+
+iii.Component Controls Its Own State: Each component is responsible for managing its own state. The state can be modified within the component based on user interactions, lifecycle events, or other logic.
+
+iv.Usage: State is used to store data that may change over time, such as user inputs, form data, or dynamic content. It allows components to respond to user actions and update the UI accordingly.
