@@ -1,71 +1,8 @@
-L-2.3<=>State: A Component's Memory:
-Components often need to change what’s on the screen as a result of an interaction. Typing into the form should update the input field, clicking “next” on an image carousel should change which image is displayed, clicking “buy” should put a product in the shopping cart. Components need to “remember” things: the current input value, the current image, the shopping cart. In React, this kind of component-specific memory is called state.
+<==>L-2.5: Render and Commit <==>:
+Before your components are displayed on screen, they must be rendered by React. 
 
-=> When A Local Variable Is not Enough: 
-i.Local variables don’t persist between renders. When React renders this component a second time, it renders it from scratch—it doesn’t consider any changes to the local variables.
-ii.Changes to local variables won’t trigger renders. React doesn’t realize it needs to render the component again with the new data.
+Imagine that your components are cooks in the kitchen, assembling tasty dishes from ingredients. In this scenario, React is the waiter who puts in requests from customers and brings them their orders. This process of requesting and serving UI has three steps:
 
-To update a component with new data, two things need to happen:
-
-i.Retain the data between renders.
-ii.Trigger React to render the component with new data (re-rendering).
-
-The useState Hook provides those two things:
-
-i.A state variable to retain the data between renders.
-ii.A state setter function to update the variable and trigger React to render the component again.
-
-
-
-=> Meet your first Hook 
-In React, useState, as well as any other function starting with “use”, is called a Hook.
-
-Hooks are special functions that are only available while React is rendering (which we’ll get into in more detail on the next page). They let you “hook into” different React features.
-
-State is just one of those features, but you will meet the other Hooks later.
-
-=>Pitfall:
-Hooks—functions starting with use—can only be called at the top level of your components or your own Hooks. You can’t call Hooks inside conditions, loops, or other nested functions. Hooks are functions, but it’s helpful to think of them as unconditional declarations about your component’s needs. You “use” React features at the top of your component similar to how you “import” modules at the top of your file.
-
-=>State is isolated and private:
-State is local to a component instance on the screen. In other words, if you render the same component twice, each copy will have completely isolated state! Changing one of them will not affect the other.
-Unlike props, state is fully private to the component declaring it. The parent component can’t change it. This lets you add state to any component or remove it without impacting the rest of the components.
-
-=>Recap
-i.Use a state variable when a component needs to “remember” some information between renders.
-ii.State variables are declared by calling the useState Hook.
-iii.Hooks are special functions that start with use. They let you “hook into” React features like state.
-iv.Hooks might remind you of imports: they need to be called unconditionally. Calling Hooks, including useState, is only valid at the top level of a component or another Hook.
-v.The useState Hook returns a pair of values: the current state and the function to update it.
-vi.You can have more than one state variable. Internally, React matches them up by their order.
-vii.State is private to the component. If you render it in two places, each copy gets its own state.
-
-=>Questions:
-
-i.Difference Between Local Variable(Regular Variable) And State Variable:
-
-Local variables: Re-initialized on every render, do not persist changes between renders.Changes to local variables won’t trigger renders. React doesn’t realize it needs to render the component again with the new data.
-State variables: Persist between renders, changes to state trigger re-renders, and the new state value is retained across renders.
-
-ii. Difference Between props And State
-
-
-In React, both props and state are used to control the behavior and appearance of components, but they serve different purposes and have distinct characteristics.
-
-Props:
-i.Passed from Parent to Child: Props are used to pass data from a parent component to a child component.
-
-ii.Read-Only: Props are read-only, meaning that a child component cannot modify its props. They are immutable within the child component.
-
-iii.Controlled by Parent: The parent component controls the values of the props. Any changes to the props must be made in the parent component.
-
-iv.Usage: Props are used to pass data and event handlers to child components. They enable communication between components in a React application.
-
-State:
-i.Private to the Component: State is managed within a component and is fully private to that component. It is not accessible directly by parent or sibling components.
-
-ii.Mutable: State is mutable, meaning that it can be changed within the component using the setState function (or useState hook in functional components).
-
-iii.Component Controls Its Own State: Each component is responsible for managing its own state. The state can be modified within the component based on user interactions, lifecycle events, or other logic.
-
-iv.Usage: State is used to store data that may change over time, such as user inputs, form data, or dynamic content. It allows components to respond to user actions and update the UI accordingly.
+i. Triggering a render (delivering the guest’s order to the kitchen)
+ii.Rendering the component (preparing the order in the kitchen)
+iii.Committing to the DOM (placing the order on the table)

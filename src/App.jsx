@@ -1,11 +1,5 @@
-import Gallery from "./components/Gallery";
+import { createRoot } from "react-dom/client";
+import Image from "./data.js";
 
-export default function App() {
-  return (
-    <div>
-      <Gallery />
-      <hr />
-      <Gallery />
-    </div>
-  );
-}
+const root = createRoot(document.getElementById("root"));
+root.render(<Image />);
