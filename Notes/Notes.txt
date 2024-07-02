@@ -1,19 +1,45 @@
-<==> L-2.7: Queueing a Series of State Updates <==>
-Setting a state variable will queue another render. But sometimes you might want to perform multiple operations on the value before queueing the next render. To do this, it helps to understand how React batches state updates.
+<==> L-2.8: Updating Objects in State <==>
 
-=>Batch Update In React:
- Batching is the process of combining multiple state updates into a single re-render. Instead of re-rendering the component every time a state update occurs, React waits until all the state updates in a given context (such as an event handler) have been processed before triggering a re-render. This minimizes the number of re-renders and improves performance by reducing unnecessary work.
+State can hold any kind of JavaScript value, including objects. But you shouldn’t change objects that you hold in the React state directly. Instead, when you want to update an object, you need to create a new one (or make a copy of an existing one), and then set the state to use that copy.
 
-How Batch Updates Work
-Event Handlers: When state updates are triggered within event handlers (e.g., onClick, onChange), React automatically batches these updates.
-Lifecycle Methods: State updates within lifecycle methods (like componentDidMount, componentDidUpdate, etc.) are also batched.
-React Hooks: Updates within hooks such as useState and useReducer are batched during the same render cycle
+=>What’s a mutation? 
 
-=>Updating the same state multiple times before the next render:
+You can store any kind of JavaScript value in state.
 
-It is an uncommon use case, but if you would like to update the same state variable multiple times before the next render, instead of passing the next state value like setNumber(number + 1), you can pass a function that calculates the next state based on the previous one in the queue, like setNumber(n => n + 1). It is a way to tell React to “do something with the state value” instead of just replacing it.
+const [x, setX] = useState(0);
+So far you’ve been working with numbers, strings, and booleans. These kinds of JavaScript values are “immutable”, meaning unchangeable or “read-only”. You can trigger a re-render to replace a value:
 
-Here, n => n + 1 is called an updater function. When you pass it to a state setter:
+setX(5);
+The x state changed from 0 to 5, but the number 0 itself did not change. It’s not possible to make any changes to the built-in primitive values like numbers, strings, and booleans in JavaScript.
 
-React queues this function to be processed after all the other code in the event handler has run.
-During the next render, React goes through the queue and gives you the final updated state.
+Now consider an object in state:
+
+const [position, setPosition] = useState({ x: 0, y: 0 });
+Technically, it is possible to change the contents of the object itself. This is called a mutation:
+
+position.x = 5;
+However, although objects in React state are technically mutable, you should treat them as if they were immutable—like numbers, booleans, and strings. Instead of mutating them, you should always replace them.
+
+=> Treat state as read-only 
+In other words, you should treat any JavaScript object that you put into state as read-only.
+
+
+=> Local Mutation is Fine:
+
+Code like this is a problem because it modifies an existing object in state:
+
+position.x = e.clientX;
+position.y = e.clientY;
+But code like this is absolutely fine because you’re mutating a fresh object you have just created:
+
+const nextPosition = {};
+nextPosition.x = e.clientX;
+nextPosition.y = e.clientY;
+setPosition(nextPosition);
+In fact, it is completely equivalent to writing this:
+
+setPosition({
+  x: e.clientX,
+  y: e.clientY
+});
+Mutation is only a problem when you change existing objects that are already in state. Mutating an object you’ve just created is okay because no other code references it yet. Changing it isn’t going to accidentally impact something that depends on it. This is called a “local mutation”. You can even do local mutation while rendering. Very convenient and completely okay!
