@@ -1,11 +1,21 @@
-import Form from "./components/Form";
+import { useState } from "react";
+import Mirror from "./components/Mirror";
 import "./styles.css";
 
 function App() {
+  const [color, setColor] = useState("pink");
   return (
-    <>
-      <Form />
-    </>
+    <div>
+      <Mirror messageColor={color} />
+      <br />
+      <button
+        onClick={() => {
+          setColor("yellow");
+        }}
+      >
+        Change Color From Parent
+      </button>
+    </div>
   );
 }
 

@@ -1,7 +1,31 @@
-<==> L-3.5:Choosing the State Structure-Avoid Contradictions In State <==>
+<==> L-3.6:Choosing the State Structure-Avoid Redundant State <==>
 
-=>Principles for structuring state:
 
-When you write a component that holds some state, you’ll have to make choices about how many state variables to use and what the shape of their data should be. While it’s possible to write correct programs even with a suboptimal state structure, there are a few principles that can guide you to make better choices:
 
-=>Avoid contradictions in state: 
+=>Avoid redundant state 
+If you can calculate some information from the component’s props or its existing state variables during rendering, you should not put that information into that component’s state. 
+
+=>Don’t mirror props in state (Deep Dive):
+
+
+
+function Message({ messageColor }) {
+  const [color, setColor] = useState(messageColor);
+
+Here, a color state variable is initialized to the messageColor prop. The problem is that if the parent component passes a different value of messageColor later (for example, 'red' instead of 'blue'), the color state variable would not be updated! 
+
+The state is only initialized during the first render.
+
+This is why “mirroring” some prop in a state variable can lead to confusion. Instead, use the messageColor prop directly in your code. If you want to give it a shorter name, use a constant:
+
+function Message({ messageColor }) {
+  const color = messageColor;
+  
+This way it won’t get out of sync with the prop passed from the parent component.
+
+”Mirroring” props into state only makes sense when you want to ignore all updates for a specific prop. By convention, start the prop name with initial or default to clarify that its new values are ignored:
+
+function Message({ initialColor }) {
+  // The `color` state variable holds the *first* value of `initialColor`.
+  // Further changes to the `initialColor` prop are ignored.
+  const [color, setColor] = useState(initialColor);
