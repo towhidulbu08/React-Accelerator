@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function Form() {
+export default function FeedbackForm() {
   const [text, setText] = useState("");
   const [status, setStatus] = useState("typing");
 
@@ -11,7 +11,10 @@ export default function Form() {
     setStatus("sent");
   }
 
-  if (status === "sent") {
+  const isSending = status === "sending";
+  const isSent = status === "sent";
+
+  if (isSent) {
     return <h1>Thanks for feedback!</h1>;
   }
 
@@ -19,15 +22,15 @@ export default function Form() {
     <form onSubmit={handleSubmit}>
       <p>How was your stay at The Prancing Pony?</p>
       <textarea
-        disabled={status === "sending"}
+        disabled={isSending}
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
       <br />
-      <button disabled={status === "sending"} type="submit">
+      <button disabled={isSending} type="submit">
         Send
       </button>
-      {status === "sending" && <p>Sending...</p>}
+      {isSending && <p>Sending...</p>}
     </form>
   );
 }
