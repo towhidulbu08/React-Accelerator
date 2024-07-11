@@ -1,20 +1,10 @@
-import { useState } from "react";
-import Mirror from "./components/Mirror";
+import TravelEditable from "./components/TravelEditable";
 import "./styles.css";
 
 function App() {
-  const [color, setColor] = useState("pink");
   return (
     <div>
-      <Mirror messageColor={color} />
-      <br />
-      <button
-        onClick={() => {
-          setColor("yellow");
-        }}
-      >
-        Change Color From Parent
-      </button>
+      <TravelEditable />
     </div>
   );
 }
