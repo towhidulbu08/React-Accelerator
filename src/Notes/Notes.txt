@@ -1,5 +1,5 @@
-<==> L-3.7:Choosing the State Structure-Avoid Duplication State <==>
+<==>L-3.8:Choosing the State Structure-Avoid Deeply Nested State<==>
 
 
 
-=>
+=>Normalization Or Flattening Deeply Nested State:
