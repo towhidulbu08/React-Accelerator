@@ -1,27 +1,34 @@
-<==>L-3.10:Preserving and Resetting State<==>
+<==> L-3.11: Resetting state at the same position - Changing Default behavior <==>
 
-State is isolated between components. React keeps track of which state belongs to which component based on their place in the UI tree. You can control when to preserve state and when to reset it between re-renders.
+By default, React preserves state of a component while it stays at the same position. Usually, this is exactly what you want, so it makes sense as the default behavior. But sometimes, you may want to reset a component’s state.
 
-=> State is tied to a position in the render tree :
+=>There are two ways to reset state when switching between them:
 
-React builds render trees for the component structure in your UI.
-When you give a component state, you might think the state “lives” inside the component. But the state is actually held inside React. React associates each piece of state it’s holding with the correct component by where that component sits in the render tree.
+1.Render components in different positions
 
-=>Note: i.When React removes a component, it destroys its state.
-        ii.React preserves a component’s state for as long as it’s being rendered at its position in the UI tree. If it gets removed, or a different component gets rendered at the same position, React discards its state.
-        iii.Same component at the same position preserves state
-        iv. Different components at the same position reset state 
+2.Give each component an explicit identity with key: Keys aren’t just for lists! You can use keys to make React distinguish between any components. By default, React uses order within the parent (“first counter”, “second counter”) to discern between components. But keys let you tell React that this is not just a first counter, or a second counter, but a specific counter—for example, Taylor’s counter. This way, React will know Taylor’s counter wherever it appears in the tree!
+Specifying a key tells React to use the key itself as part of the position, instead of their order within the parent. This is why, even though you render them in the same place in JSX, React sees them as two different counters, and so they will never share state. Every time a counter appears on the screen, its state is created. Every time it is removed, its state is destroyed. Toggling between them resets their state over and over.
 
-
-You will learn:
-i.When React chooses to preserve or reset the state
-ii.How to force React to reset component’s state
-iii.How keys and types affect whether the state is preserved
+=>Note:
+1.Remember that keys are not globally unique. They only specify the position within the parent.
+2.A JavaScript && expression returns the value of its right side (in our case, the checkmark) if the left side (our condition) is true. But if the condition is false, the whole expression becomes false. React considers false as a “hole” in the JSX tree, just like null or undefined, and doesn’t render anything in its place.
 
 
+=>Deep Dive:Preserving state for removed components :
 
 
-=>Rule Of Thumb: As a rule of thumb, if you want to preserve the state between re-renders, the structure of your tree needs to “match up” from one render to another. If the structure is different, the state gets destroyed because React destroys state when it removes a component from the tree.
+In a real chat app, you’d probably want to recover the input state when the user selects the previous recipient again. There are a few ways to keep the state “alive” for a component that’s no longer visible:
 
-=>Pitfall:
-This is why you should not nest component function definitions.
+1.You could render all chats instead of just the current one, but hide all the others with CSS. The chats would not get removed from the tree, so their local state would be preserved. This solution works great for simple UIs. But it can get very slow if the hidden trees are large and contain a lot of DOM nodes.
+
+2.You could lift the state up and hold the pending message for each recipient in the parent component. This way, when the child components get removed, it doesn’t matter, because it’s the parent that keeps the important information. This is the most common solution.
+
+3.You might also use a different source in addition to React state. For example, you probably want a message draft to persist even if the user accidentally closes the page. To implement this, you could have the Chat component initialize its state by reading from the localStorage, and save the drafts there too.
+No matter which strategy you pick, a chat with Alice is conceptually distinct from a chat with Bob, so it makes sense to give a key to the <Chat> tree based on the current recipient.
+
+=>Recap:
+1.React keeps state for as long as the same component is rendered at the same position.
+2.State is not kept in JSX tags. It’s associated with the tree position in which you put that JSX.
+3.You can force a subtree to reset its state by giving it a different key.
+Don’t nest component definitions, or you’ll reset state by accident.
+
