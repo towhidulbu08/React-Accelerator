@@ -1,46 +1,40 @@
-import { useState } from "react";
+/* eslint-disable no-undef */
+import { useReducer } from "react";
 import AddTask from "./Components/AddTask";
 import TaskList from "./Components/TaskLists";
 import initialTasks from "./Data/data";
+import taskReducer from "./Reducers/taskReducer";
 
 export default function App() {
-  const [tasks, setTasks] = useState(initialTasks);
+  const [tasks, dispatch] = useReducer(taskReducer, initialTasks);
+
+  const getId = (data) => {
+    const maxId = data.reduce((prev, curr) =>
+      prev.id > curr.id ? prev.id : curr.id
+    );
+    return maxId + 1;
+  };
 
   const handleAddTask = (text) => {
-    // let currentLastId = tasks[tasks.length - 1].id;
-    // let nextId = currentLastId++;
-    // let Done = !tasks[tasks.length - 1].done;
-
-    const getId = (data) => {
-      const maxId = data.reduce((prev, curr) =>
-        prev.id > curr.id ? prev.id : curr.id
-      );
-      return maxId + 1;
-    };
-    const nextId = getId(tasks);
-    setTasks([
-      ...tasks,
-      {
-        id: nextId,
-        text: text,
-        done: false,
-      },
-    ]);
+    dispatch({
+      type: "added",
+      text,
+      id: getId(tasks),
+    }); //added
   };
 
   const handleChangeTask = (task) => {
-    const nextTasks = tasks.map((t) => {
-      if (t.id === task.id) {
-        return task;
-      } else {
-        return t;
-      }
+    dispatch({
+      type: "changed",
+      task,
     });
-    setTasks(nextTasks);
   };
 
   const handleDeleteTask = (taskId) => {
-    setTasks(tasks.filter((task) => task.id !== taskId));
+    dispatch({
+      type: "deleted",
+      id: taskId,
+    });
   };
 
   return (

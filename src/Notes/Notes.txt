@@ -1,1 +1,44 @@
-<==>L-3.12 Extracting State Logic into a Reducer - Example project<==>
+<==>L-3.13 Three steps to Consolidate state logic with a reducer<==>
+
+=>New Term : Business Logic
+
+Each of its event handlers calls setTasks in order to update the state. As this component grows, so does the amount of state logic sprinkled throughout it. To reduce this complexity and keep all your logic in one easy-to-access place, you can move that state logic into a single function outside your component, called a “reducer”.
+
+Reducers are a different way to handle state. You can migrate from useState to useReducer in three steps:
+
+1.Move from setting state to dispatching actions.
+2.Write a reducer function.
+3.Use the reducer from your component.
+
+=>Managing state with reducers is slightly different from directly setting state. Instead of telling React “what to do” by setting state, you specify “what the user just did” by dispatching “actions” from your event handlers. (The state update logic will live elsewhere!) So instead of “setting tasks” via an event handler, you’re dispatching an “added/changed/deleted a task” action. This is more descriptive of the user’s intent.
+
+=>Dispatch Object:The object you pass to dispatch is called an “action”.It is a regular JavaScript object. You decide what to put in it, but generally it should contain the minimal information about what happened. (You will add the dispatch function itself in a later step.).An action object can have any shape.
+
+By convention, it is common to give it a string type that describes what happened, and pass any additional information in other fields. The type is specific to a component, so in this example either 'added' or 'added_task' would be fine. Choose a name that says what happened!
+
+=> Reducer Function:A reducer function is where you will put your state logic. It takes two arguments, the current state and the action object, and it returns the next state:
+
+=>React will set the state to what you return from the reducer.
+
+To move your state setting logic from your event handlers to a reducer function in this example, you will:
+
+1.Declare the current state (tasks) as the first argument.
+2.Declare the action object as the second argument.
+3.Return the next state from the reducer (which React will set the state to).
+
+=>Note:You can write your React code (logic) More Declaratively using useReducer hook 
+
+=>Revision: switch (expression) {
+  case value1:
+    // Code to execute if expression === value1
+    break;
+
+  case value2:
+    // Code to execute if expression === value2
+    break;
+
+  // More cases...
+
+  default:
+    // Code to execute if none of the above cases match
+}
