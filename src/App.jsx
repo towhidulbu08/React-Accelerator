@@ -1,25 +1,14 @@
+import AllPosts from "./Components/AllPosts";
 import Heading from "./Components/Heading";
+import Post from "./Components/Post";
 import Section from "./Components/Section";
 
 export default function App() {
   return (
-    <Section>
-      <Heading>Title</Heading>
-      <Section>
-        <Heading>Heading</Heading>
-        <Heading>Heading</Heading>
-        <Heading>Heading</Heading>
-        <Section>
-          <Heading>Sub-heading</Heading>
-          <Heading>Sub-heading</Heading>
-          <Heading>Sub-heading</Heading>
-          <Section>
-            <Heading>Sub-sub-heading</Heading>
-            <Heading>Sub-sub-heading</Heading>
-            <Heading>Sub-sub-heading</Heading>
-          </Section>
-        </Section>
-      </Section>
+    <Section isFancy={true}>
+      <Heading>My Profile</Heading>
+      <Post title="Hello traveller!" body="Read about my adventures." />
+      <AllPosts />
     </Section>
   );
 }
