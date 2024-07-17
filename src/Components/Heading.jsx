@@ -3,6 +3,7 @@ import levelContext from "../Contexts/LevelContext";
 
 export default function Heading({ children }) {
   const level = useContext(levelContext);
+  console.log(level);
 
   switch (level) {
     case 1:
