@@ -1,15 +1,28 @@
-<==>L-3.15 Writing concise reducers with Immer<==>
+<==>L-3.16 Passing Data Deeply with Context - Introduction to Context API<==>
 
-Just like with updating objects and arrays in regular state, you can use the Immer library to make reducers more concise. Here, useImmerReducer lets you mutate the state with push or arr[i] = assignment:
+Usually, you will pass information from a parent component to a child component via props. But passing props can become verbose and inconvenient if you have to pass them through many components in the middle, or if many components in your app need the same information. Context lets the parent component make some information available to any component in the tree below it—no matter how deep—without passing it explicitly through props.
 
-Reducers must be pure, so they shouldn’t mutate state. But Immer provides you with a special draft object which is safe to mutate. Under the hood, Immer will create a copy of your state with the changes you made to the draft. This is why reducers managed by useImmerReducer can mutate their first argument and don’t need to return state.
+=>You will learn:
+1.What “prop drilling” is
+2.How to replace repetitive prop passing with context
+3.Common use cases for context
+4.Common alternatives to context
 
-=>Recap:
-1.To convert from useState to useReducer:
-    i.Dispatch actions from event handlers.
-    ii.Write a reducer function that returns the next state for a given state and action.
-    iii.Replace useState with useReducer.
-2.Reducers require you to write a bit more code, but they help with debugging and testing.
-3.Reducers must be pure.
-4.Each action describes a single user interaction.
-5.Use Immer if you want to write reducers in a mutating style.
+=>The problem with passing props: 
+Passing props is a great way to explicitly pipe data through your UI tree to the components that use it.
+
+But passing props can become verbose and inconvenient when you need to pass some prop deeply through the tree, or if many components need the same prop. The nearest common ancestor could be far removed from the components that need data, and lifting state up that high can lead to a situation called “prop drilling”.
+
+Context: an alternative to passing props 
+Context lets a parent component provide data to the entire tree below it. There are many uses for context.
+
+You will do it in three steps:
+
+i.Create a context. (You can call it LevelContext, since it’s for the heading level.)
+ii.Use that context from the component that needs the data. (Heading will use LevelContext.)
+iii.Provide that context from the component that specifies the data. (Section will provide LevelContext.)
+Context lets a parent—even a distant one!—provide some data to the entire tree inside of it.
+
+Note:
+i.The only argument to createContext is the default value
+ii.useContext is a Hook. Just like useState and useReducer, you can only call a Hook immediately inside a React component (not inside loops or conditions). useContext tells React that the Heading component wants to read the LevelContext.
