@@ -1,9 +1,13 @@
 /* eslint-disable react/prop-types */
 
 import { useState } from "react";
+import { useTaskDispatch } from "../Contexts/TasksContext";
 
-export default function Task({ task, onChangeTask, onDelete }) {
+export default function Task({ task }) {
   const [isEditing, setIsEditing] = useState(false);
+
+  const dispatch = useTaskDispatch();
+
   let texContent;
   if (isEditing) {
     texContent = (
@@ -12,9 +16,12 @@ export default function Task({ task, onChangeTask, onDelete }) {
           type="text"
           value={task.text}
           onChange={(e) => {
-            onChangeTask({
-              ...task,
-              text: e.target.value,
+            dispatch({
+              type: "changed",
+              task: {
+                ...task,
+                text: e.target.value,
+              },
             });
           }}
         />
@@ -48,15 +55,24 @@ export default function Task({ task, onChangeTask, onDelete }) {
         type="checkbox"
         checked={task.done}
         onChange={(e) => {
-          onChangeTask({
-            ...task,
-            done: e.target.checked,
+          dispatch({
+            type: "changed",
+            task: { ...task, done: e.target.checked },
           });
         }}
       />
       {texContent}
 
-      <button onClick={() => onDelete(task.id)}>Delete</button>
+      <button
+        onClick={() =>
+          dispatch({
+            type: "deleted",
+            id: task.id,
+          })
+        }
+      >
+        Delete
+      </button>
     </label>
   );
 }
