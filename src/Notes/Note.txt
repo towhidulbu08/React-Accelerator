@@ -1,0 +1,24 @@
+<==>L-4.1 Referencing Values with Refs<==>
+
+=>Referencing Values with Refs:
+
+When you want a component to “remember” some information, but you don’t want that information to trigger new renders, you can use a ref.
+
+=>You will learn:
+i.How to add a ref to your component
+ii.How to update a ref’s value
+iii.How refs are different from state
+iv.How to use refs safely
+
+=>Adding a ref to your component:
+
+Inside your component, call the useRef Hook and pass the initial value that you want to reference as the only argument. For example, here is a ref to the value 0:
+
+const ref = useRef(0);
+useRef returns an object like this:
+
+{ 
+  current: 0 // The value you passed to useRef
+}
+
+You can access the current value of that ref through the ref.current property. This value is intentionally mutable, meaning you can both read and write to it
