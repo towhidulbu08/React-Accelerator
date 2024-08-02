@@ -1,12 +1,17 @@
+import { useState } from "react";
 import "./App.css";
-import Stopwatch from "./components/Counter";
+import CatFriends from "./components/CatFriends";
 
 function App() {
-    return (
-        <div>
-            <Stopwatch />
-        </div>
-    );
+  const [show, setShow] = useState(true);
+  return (
+    <div>
+      {show && <CatFriends />}
+      <button onClick={() => setShow((s) => !s)}>
+        {show ? "Hide" : "Show"}
+      </button>
+    </div>
+  );
 }
 
 export default App;
