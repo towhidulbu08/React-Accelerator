@@ -1,9 +1,10 @@
 import { forwardRef } from "react";
 
 const MyInput = function (props, ref) {
-    return <input {...props} ref={ref} />;
+  console.log(props);
+  return <input {...props} ref={ref} />;
 };
 
-const ForwardedMyInput = forwardRef(MyInput);
+const ForwardedMyInput = forwardRef(MyInput); // Here forwardRef is a Higher order component
 
 export default ForwardedMyInput;
