@@ -1,0 +1,28 @@
+<==>L-4.4 Exposing a subset of the API with an imperative handle<==>
+
+=>Deep Dive
+Exposing a subset of the API with  an imperative handle :
+
+In the above example, MyInput exposes the original DOM input element. This lets the parent component call focus() on it. However, this also lets the parent component do something else—for example, change its CSS styles. In uncommon cases, you may want to restrict the exposed functionality. You can do that with useImperativeHandle:
+
+import {
+  forwardRef, 
+  useRef, 
+  useImperativeHandle
+} from 'react';
+
+const MyInput = forwardRef((props, ref) => {
+
+  const realInputRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    // Only expose focus and nothing else
+    focus() {
+      realInputRef.current.focus();
+    },
+  }));
+  return <input {...props} ref={realInputRef} />;
+});
+
+
+Here, realInputRef inside MyInput holds the actual input DOM node. However, useImperativeHandle instructs React to provide your own special object as the value of a ref to the parent component. So inputRef.current inside the Form component will only have the focus method. In this case, the ref “handle” is not the DOM node, but the custom object you create inside useImperativeHandle call.
