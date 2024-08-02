@@ -1,28 +1,69 @@
-<==>L-4.4 Exposing a subset of the API with an imperative handle<==>
+<==>L-4.5 When React attaches the refs & Best practices for DOM manipulation with refs<==>
 
-=>Deep Dive
-Exposing a subset of the API with  an imperative handle :
+=>When React attaches the refs: 
+In React, every update is split in two phases:
 
-In the above example, MyInput exposes the original DOM input element. This lets the parent component call focus() on it. However, this also lets the parent component do something else—for example, change its CSS styles. In uncommon cases, you may want to restrict the exposed functionality. You can do that with useImperativeHandle:
+1.During render, React calls your components to figure out what should be on the screen.
+2.During commit, React applies changes to the DOM.
+In general, you don’t want to access refs during rendering. That goes for refs holding DOM nodes as well. During the first render, the DOM nodes have not yet been created, so ref.current will be null. And during the rendering of updates, the DOM nodes haven’t been updated yet. So it’s too early to read them.
 
-import {
-  forwardRef, 
-  useRef, 
-  useImperativeHandle
-} from 'react';
+React sets ref.current during the commit. Before updating the DOM, React sets the affected ref.current values to null. After updating the DOM, React immediately sets them to the corresponding DOM nodes.
 
-const MyInput = forwardRef((props, ref) => {
-
-  const realInputRef = useRef(null);
-
-  useImperativeHandle(ref, () => ({
-    // Only expose focus and nothing else
-    focus() {
-      realInputRef.current.focus();
-    },
-  }));
-  return <input {...props} ref={realInputRef} />;
-});
+Usually, you will access refs from event handlers. If you want to do something with a ref, but there is no particular event to do it in, you might need an Effect. We will discuss Effects on the next pages.
 
 
-Here, realInputRef inside MyInput holds the actual input DOM node. However, useImperativeHandle instructs React to provide your own special object as the value of a ref to the parent component. So inputRef.current inside the Form component will only have the focus method. In this case, the ref “handle” is not the DOM node, but the custom object you create inside useImperativeHandle call.
+=>Best practices for DOM manipulation with refs: 
+Refs are an escape hatch. You should only use them when you have to “step outside React”. Common examples of this include managing focus, scroll position, or calling browser APIs that React does not expose.
+
+If you stick to non-destructive actions like focusing and scrolling, you shouldn’t encounter any problems. However, if you try to modify the DOM manually, you can risk conflicting with the changes React is making.
+
+To illustrate this problem, this example includes a welcome message and two buttons. The first button toggles its presence using conditional rendering and state, as you would usually do in React. The second button uses the remove() DOM API to forcefully remove it from the DOM outside of React’s control.
+
+Try pressing “Toggle with setState” a few times. The message should disappear and appear again. Then press “Remove from the DOM”. This will forcefully remove it. Finally, press “Toggle with setState”:
+
+
+
+import { useState, useRef } from 'react';
+
+export default function Counter() {
+  const [show, setShow] = useState(true);
+  const ref = useRef(null);
+
+  return (
+    <div>
+      <button
+        onClick={() => {
+          setShow(!show);
+        }}>
+        Toggle with setState
+      </button>
+      <button
+        onClick={() => {
+          ref.current.remove();
+        }}>
+        Remove from the DOM
+      </button>
+      {show && <p ref={ref}>Hello world</p>}
+    </div>
+  );
+}
+
+
+
+
+After you’ve manually removed the DOM element, trying to use setState to show it again will lead to a crash. This is because you’ve changed the DOM, and React doesn’t know how to continue managing it correctly.
+
+Avoid changing DOM nodes managed by React. Modifying, adding children to, or removing children from elements that are managed by React can lead to inconsistent visual results or crashes like above.
+
+However, this doesn’t mean that you can’t do it at all. It requires caution. You can safely modify parts of the DOM that React has no reason to update. For example, if some <div> is always empty in the JSX, React won’t have a reason to touch its children list. Therefore, it is safe to manually add or remove elements there.
+
+Recap:
+1.Refs are a generic concept, but most often you’ll use them to hold DOM elements.
+2.You instruct React to put a DOM node into myRef.current by passing <div ref={myRef}>.
+3.Usually, you will use refs for non-destructive actions like focusing, scrolling, or measuring DOM elements.
+4.A component doesn’t expose its DOM nodes by default. You can opt into exposing a DOM node by using forwardRef and passing the second ref argument down to a specific node.
+5.Avoid changing DOM nodes managed by React.
+6.If you do modify DOM nodes managed by React, modify parts that React has no reason to update.
+
+
+
