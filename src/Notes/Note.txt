@@ -1,0 +1,12 @@
+<=>4.11 Synchronizing with Effects - Putting it all together in one example<=>
+
+
+
+=>1.React always cleans up the previous render’s Effect before the next render’s Effect. This is why even if you type into the input fast, there is at most one timeout scheduled at a time. Edit the input a few times and watch the console to get a feel for how Effects get cleaned up.
+
+
+=>2.Type something into the input and then immediately press “Unmount the component”. Notice how unmounting cleans up the last render’s Effect. Here, it clears the last timeout before it has a chance to fire.
+
+=>3.Each Effect “captures” the text value from its corresponding render.
+
+=>4.Effects from each render are isolated from each other.
