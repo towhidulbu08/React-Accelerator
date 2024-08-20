@@ -1,0 +1,76 @@
+<=> 4.14 You Might Not Need an Effect - More examples<=>
+
+=>Initializing the application:
+
+Some logic should only run once when the app loads.
+
+You might be tempted to place it in an Effect in the top-level component:
+
+function App() {
+  // 🔴 Avoid: Effects with logic that should only ever run once
+  useEffect(() => {
+    loadDataFromLocalStorage();
+    checkAuthToken();
+  }, []);
+  // ...
+}
+
+However, you’ll quickly discover that it runs twice in development. This can cause issues—for example, maybe it invalidates the authentication token because the function wasn’t designed to be called twice. In general, your components should be resilient to being remounted. This includes your top-level App component.
+
+if some logic must run once per app load rather than once per component mount, add a top-level variable to track whether it has already executed:
+
+let didInit = false;
+
+function App() {
+  useEffect(() => {
+    if (!didInit) {
+      didInit = true;
+      // ✅ Only runs once per app load
+      loadDataFromLocalStorage();
+      checkAuthToken();
+    }
+  }, []);
+  // ...}
+
+=>Notifying parent components about state changes:
+
+Note:React batches updates from different components together, so there will only be one render pass.
+
+=>Passing data to the parent:
+
+In React, data flows from the parent components to their children. When you see something wrong on the screen, you can trace where the information comes from by going up the component chain until you find which component passes the wrong prop or has the wrong state. When child components update the state of their parent components in Effects, the data flow becomes very difficult to trace. Since both the child and the parent need the same data, let the parent component fetch that data, and pass it down to the child instead:
+
+=>Subscribing to an external store:
+ 
+Sometimes, your components may need to subscribe to some data outside of the React state. This data could be from a third-party library or a built-in browser API. Since this data can change without React’s knowledge, you need to manually subscribe your components to it. This is often done with an Effect, 
+
+
+
+=>useSyncExternalStore:
+
+useSyncExternalStore is a React Hook that lets you subscribe to an external store.
+
+const snapshot = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot?)
+
+=>Usage:
+i.Subscribing to an external store
+ii.Subscribing to a browser API
+iii.Extracting the logic to a custom Hook
+iv.Adding support for server rendering
+
+
+It returns the snapshot of the data in the store. You need to pass two functions as arguments:
+
+1.The subscribe function should subscribe to the store and return a function that unsubscribes.
+2.The getSnapshot function should read a snapshot of the data from the store.
+See more examples below.
+
+=>Parameters: 
+1.subscribe: A function that takes a single callback argument and subscribes it to the store. When the store changes, it should invoke the provided callback. This will cause the component to re-render. The subscribe function should return a function that cleans up the subscription.
+
+2.getSnapshot: A function that returns a snapshot of the data in the store that’s needed by the component. While the store has not changed, repeated calls to getSnapshot must return the same value. If the store changes and the returned value is different (as compared by Object.is), React re-renders the component.
+
+3.optional getServerSnapshot: A function that returns the initial snapshot of the data in the store. It will be used only during server rendering and during hydration of server-rendered content on the client. The server snapshot must be the same between the client and the server, and is usually serialized and passed from the server to the client. If you omit this argument, rendering the component on the server will throw an error.
+
+=>Returns: 
+The current snapshot of the store which you can use in your rendering logic.
