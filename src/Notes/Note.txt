@@ -1,4 +1,4 @@
-<=> 4.14 You Might Not Need an Effect - More examples<=>
+<=> 4.15 You Might Not Need an Effect - Fetching data - Avoid Race Condition<=>
 
 =>Fetching data:
 
