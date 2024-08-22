@@ -1,3 +1,5 @@
 export function getRndInteger(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+  const range = max - min;
+  const random = Math.random();
+  return Math.floor(random * (range + 1)) + min;
 }
