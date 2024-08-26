@@ -1,0 +1,165 @@
+<==>4.21 Removing Effect Dependencies - Part 1<==>
+
+=>Removing Effect Dependencies:
+
+When you write an Effect, the linter will verify that you’ve included every reactive value (like props and state) that the Effect reads in the list of your Effect’s dependencies. This ensures that your Effect remains synchronized with the latest props and state of your component. Unnecessary dependencies may cause your Effect to run too often, or even create an infinite loop. Follow this guide to review and remove unnecessary dependencies from your Effects.
+
+=>You will learn:
+
+i.How to fix infinite Effect dependency loops
+ii.What to do when you want to remove a dependency
+iii.How to read a value from your Effect without “reacting” to it
+iv.How and why to avoid object and function dependencies
+v.Why suppressing the dependency linter is dangerous, and what to do instead
+
+
+=>To remove a dependency, prove that it’s not a dependency:
+
+Notice that you can’t “choose” the dependencies of your Effect. Every reactive value used by your Effect’s code must be declared in your dependency list. The dependency list is determined by the surrounding code:
+
+const serverUrl = 'https://localhost:1234';
+
+function ChatRoom({ roomId }) { // This is a reactive value
+  useEffect(() => {
+    const connection = createConnection(serverUrl, roomId); // This Effect reads that reactive value
+    connection.connect();
+    return () => connection.disconnect();
+  }, [roomId]); // ✅ So you must specify that reactive value as a dependency of your Effect
+  // ...
+}
+
+Reactive values include props and all variables and functions declared directly inside of your component. Since roomId is a reactive value, you can’t remove it from the dependency list. The linter wouldn’t allow it:
+
+const serverUrl = 'https://localhost:1234';
+
+function ChatRoom({ roomId }) {
+  useEffect(() => {
+    const connection = createConnection(serverUrl, roomId);
+    connection.connect();
+    return () => connection.disconnect();
+  }, []); // 🔴 React Hook useEffect has a missing dependency: 'roomId'
+  // ...
+}
+
+And the linter would be right! Since roomId may change over time, this would introduce a bug in your code.
+
+To remove a dependency, “prove” to the linter that it doesn’t need to be a dependency. For example, you can move roomId out of your component to prove that it’s not reactive and won’t change on re-renders:
+
+const serverUrl = 'https://localhost:1234';
+const roomId = 'music'; // Not a reactive value anymore
+
+function ChatRoom() {
+  useEffect(() => {
+    const connection = createConnection(serverUrl, roomId);
+    connection.connect();
+    return () => connection.disconnect();
+  }, []); // ✅ All dependencies declared
+  // ...
+}
+
+Now that roomId is not a reactive value (and can’t change on a re-render), it doesn’t need to be a dependency:
+
+
+import { useState, useEffect } from 'react';
+import { createConnection } from './chat.js';
+
+const serverUrl = 'https://localhost:1234';
+const roomId = 'music';
+
+export default function ChatRoom() {
+  useEffect(() => {
+    const connection = createConnection(serverUrl, roomId);
+    connection.connect();
+    return () => connection.disconnect();
+  }, []);
+  return <h1>Welcome to the {roomId} room!</h1>;
+}
+
+This is why you could now specify an empty ([]) dependency list. Your Effect really doesn’t depend on any reactive value anymore, so it really doesn’t need to re-run when any of the component’s props or state change.
+
+
+=>To change the dependencies, change the code:
+
+You might have noticed a pattern in your workflow:
+
+i.First, you change the code of your Effect or how your reactive values are declared.
+ii.Then, you follow the linter and adjust the dependencies to match the code you have changed.
+iii.If you’re not happy with the list of dependencies, you go back to the first step (and change the code again).
+
+The last part is important. If you want to change the dependencies, change the surrounding code first. You can think of the dependency list as a list of all the reactive values used by your Effect’s code. You don’t choose what to put on that list. The list describes your code. To change the dependency list, change the code.
+
+This might feel like solving an equation. You might start with a goal (for example, to remove a dependency), and you need to “find” the code matching that goal. Not everyone finds solving equations fun, and the same thing could be said about writing Effects! Luckily, there is a list of common recipes that you can try below.
+
+
+
+=>Pitfall:
+
+If you have an existing codebase, you might have some Effects that suppress the linter like this:
+
+useEffect(() => {
+  // ...
+  // 🔴 Avoid suppressing the linter like this:
+  // eslint-ignore-next-line react-hooks/exhaustive-deps
+}, []);
+
+When dependencies don’t match the code, there is a very high risk of introducing bugs. By suppressing the linter, you “lie” to React about the values your Effect depends on.
+
+Instead, use the techniques below.
+
+=>Deep Dive:
+Why is suppressing the dependency linter so dangerous? 
+
+Suppressing the linter leads to very unintuitive bugs that are hard to find and fix. Here’s one example:
+
+import { useState, useEffect } from 'react';
+
+export default function Timer() {
+  const [count, setCount] = useState(0);
+  const [increment, setIncrement] = useState(1);
+
+  function onTick() {
+	setCount(count + increment);
+  }
+
+  useEffect(() => {
+    const id = setInterval(onTick, 1000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <>
+      <h1>
+        Counter: {count}
+        <button onClick={() => setCount(0)}>Reset</button>
+      </h1>
+      <hr />
+      <p>
+        Every second, increment by:
+        <button disabled={increment === 0} onClick={() => {
+          setIncrement(i => i - 1);
+        }}>–</button>
+        <b>{increment}</b>
+        <button onClick={() => {
+          setIncrement(i => i + 1);
+        }}>+</button>
+      </p>
+    </>
+  );
+}
+
+Let’s say that you wanted to run the Effect “only on mount”. You’ve read that empty ([]) dependencies do that, so you’ve decided to ignore the linter, and forcefully specified [] as the dependencies.
+
+This counter was supposed to increment every second by the amount configurable with the two buttons. However, since you “lied” to React that this Effect doesn’t depend on anything, React forever keeps using the onTick function from the initial render. During that render, count was 0 and increment was 1. This is why onTick from that render always calls setCount(0 + 1) every second, and you always see 1. Bugs like this are harder to fix when they’re spread across multiple components.
+
+There’s always a better solution than ignoring the linter! To fix this code, you need to add onTick to the dependency list. (To ensure the interval is only setup once, make onTick an Effect Event.)
+
+We recommend treating the dependency lint error as a compilation error. If you don’t suppress it, you will never see bugs like this. The rest of this page documents the alternatives for this and other cases.
+
+
+
+
+
+
+
+

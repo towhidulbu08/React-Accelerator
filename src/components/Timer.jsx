@@ -6,6 +6,9 @@ export default function Timer() {
   const [count, setCount] = useState(0);
   const [increment, setIncrement] = useState(1);
 
+  // const onTick = useEffectEvent(() => {
+  //   setCount(count + increment);
+  // });
   const onTick = () => {
     setCount(count + increment);
   };
