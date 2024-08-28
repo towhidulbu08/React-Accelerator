@@ -8,7 +8,11 @@ export default function Form() {
     <>
       <label>
         First name:
-        <input {...firstNameProps} />
+        <input
+          value={firstNameProps.value}
+          onChange={firstNameProps.onChange}
+          {...firstNameProps}
+        />
       </label>
       <br />
       <label>
