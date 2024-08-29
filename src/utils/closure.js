@@ -15,4 +15,4 @@ function outerFunction() {
 let closureExample = outerFunction();
 
 // Call the inner function, which still has access to outerVariable
-console.log(closureExample());
+//console.log(closureExample());

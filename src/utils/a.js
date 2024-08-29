@@ -33,8 +33,8 @@ const hours = dateObject.getUTCHours();
 const minutes = dateObject.getUTCMinutes();
 const seconds = dateObject.getUTCSeconds();
 
-console.log("Elapsed time:");
-console.log(`${days} days`);
-console.log(`${hours} hours`);
-console.log(`${minutes} minutes`);
-console.log(`${seconds} seconds`);
+// console.log("Elapsed time:");
+// console.log(`${days} days`);
+// console.log(`${hours} hours`);
+// console.log(`${minutes} minutes`);
+// console.log(`${seconds} seconds`);

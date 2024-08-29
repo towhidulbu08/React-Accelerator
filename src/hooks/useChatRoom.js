@@ -17,5 +17,5 @@ export function useChatRoom({ serverUrl, roomId, onReceiveMessage }) {
     connection.connect();
     //cleanup
     return () => connection.disconnect();
-  }, [roomId, serverUrl]);
+  }, [roomId, serverUrl, onReceiveMessage]);
 }

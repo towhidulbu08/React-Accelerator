@@ -1,15 +1,23 @@
 import { useState } from "react";
-import { useChatRoom } from "../hooks/useChatRoom.js";
-import { showNotification } from "../utils/notification.js";
+import { useChatRoom } from "../hooks/useChatRoom";
+//import { showNotification } from "../utils/notification.js";
 
 export default function ChatRoom({ roomId }) {
   const [serverUrl, setServerUrl] = useState("https://localhost:1234");
 
+  // useChatRoom({
+  //   roomId,
+  //   serverUrl,
+  //   onReceiveMessage(msg) {
+  //     showNotification("New message: " + msg);
+  //   },
+  // });
+
   useChatRoom({
-    serverUrl,
     roomId,
+    serverUrl,
     onReceiveMessage(msg) {
-      showNotification("New message: " + msg);
+      console.log(msg);
     },
   });
 
