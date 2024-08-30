@@ -1,151 +1,98 @@
-<==>L-4.25 Reusing Logic with Custom Hooks - Part:3<==>
+<==>L-4.26 Reusing Logic with Custom Hooks - Part:4<==>
 
-=>When to use custom Hooks: 
-You don’t need to extract a custom Hook for every little duplicated bit of code. Some duplication is fine. For example, extracting a useFormInput Hook to wrap a single useState call like earlier is probably unnecessary.
+=>Custom Hooks help you migrate to better patterns: 
+Effects are an “escape hatch”: you use them when you need to “step outside React” and when there is no better built-in solution for your use case. With time, the React team’s goal is to reduce the number of the Effects in your app to the minimum by providing more specific solutions to more specific problems. Wrapping your Effects in custom Hooks makes it easier to upgrade your code when these solutions become available.
 
-However, whenever you write an Effect, consider whether it would be clearer to also wrap it in a custom Hook. You shouldn’t need Effects very often, so if you’re writing one, it means that you need to “step outside React” to synchronize with some external system or to do something that React doesn’t have a built-in API for. Wrapping it into a custom Hook lets you precisely communicate your intent and how the data flows through it.
+Let’s return to this example:
 
-For example, consider a ShippingForm component that displays two dropdowns: one shows the list of cities, and another shows the list of areas in the selected city. You might start with some code that looks like this:
 
-function ShippingForm({ country }) {
-  const [cities, setCities] = useState(null);
-  // This Effect fetches cities for a country
+import { useState, useEffect } from 'react';
+
+export function useOnlineStatus() {
+  const [isOnline, setIsOnline] = useState(true);
   useEffect(() => {
-    let ignore = false;
-    fetch(`/api/cities?country=${country}`)
-      .then(response => response.json())
-      .then(json => {
-        if (!ignore) {
-          setCities(json);
-        }
-      });
+    function handleOnline() {
+      setIsOnline(true);
+    }
+    function handleOffline() {
+      setIsOnline(false);
+    }
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
     return () => {
-      ignore = true;
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
-  }, [country]);
-
-  const [city, setCity] = useState(null);
-  const [areas, setAreas] = useState(null);
-  // This Effect fetches areas for the selected city
-  useEffect(() => {
-    if (city) {
-      let ignore = false;
-      fetch(`/api/areas?city=${city}`)
-        .then(response => response.json())
-        .then(json => {
-          if (!ignore) {
-            setAreas(json);
-          }
-        });
-      return () => {
-        ignore = true;
-      };
-    }
-  }, [city]);
-
-  // ...}
-Although this code is quite repetitive, it’s correct to keep these Effects separate from each other. They synchronize two different things, so you shouldn’t merge them into one Effect. Instead, you can simplify the ShippingForm component above by extracting the common logic between them into your own useData Hook:
-
-function useData(url) {
-  const [data, setData] = useState(null);
-  useEffect(() => {
-    if (url) {
-      let ignore = false;
-      fetch(url)
-        .then(response => response.json())
-        .then(json => {
-          if (!ignore) {
-            setData(json);
-          }
-        });
-      return () => {
-        ignore = true;
-      };
-    }
-  }, [url]);
-  return data;
+  }, []);
+  return isOnline;
 }
-Now you can replace both Effects in the ShippingForm components with calls to useData:
 
-function ShippingForm({ country }) {
-  const cities = useData(`/api/cities?country=${country}`);
-  const [city, setCity] = useState(null);
-  const areas = useData(city ? `/api/areas?city=${city}` : null);
-  // ...}
-Extracting a custom Hook makes the data flow explicit. You feed the url in and you get the data out. By “hiding” your Effect inside useData, you also prevent someone working on the ShippingForm component from adding unnecessary dependencies to it. With time, most of your app’s Effects will be in custom Hooks.
+
+
+
+In the above example, useOnlineStatus is implemented with a pair of useState and useEffect. However, this isn’t the best possible solution. There is a number of edge cases it doesn’t consider. For example, it assumes that when the component mounts, isOnline is already true, but this may be wrong if the network already went offline. You can use the browser navigator.onLine API to check for that, but using it directly would not work on the server for generating the initial HTML. In short, this code could be improved.
+
+Luckily, React 18 includes a dedicated API called useSyncExternalStore which takes care of all of these problems for you. Here is how your useOnlineStatus Hook, rewritten to take advantage of this new API:
+
+
+import { useSyncExternalStore } from 'react';
+
+function subscribe(callback) {
+  window.addEventListener('online', callback);
+  window.addEventListener('offline', callback);
+  return () => {
+    window.removeEventListener('online', callback);
+    window.removeEventListener('offline', callback);
+  };
+}
+
+export function useOnlineStatus() {
+  return useSyncExternalStore(
+    subscribe,
+    () => navigator.onLine, // How to get the value on the client
+    () => true // How to get the value on the server
+  );
+}
+
+
+
+
+
+Notice how you didn’t need to change any of the components to make this migration:
+
+function StatusBar() {
+  const isOnline = useOnlineStatus();
+  // ...
+}
+
+function SaveButton() {
+  const isOnline = useOnlineStatus();
+  // ...
+}
+This is another reason for why wrapping Effects in custom Hooks is often beneficial:
+
+1.You make the data flow to and from your Effects very explicit.
+2.You let your components focus on the intent rather than on the exact implementation of your Effects.
+3.When React adds new features, you can remove those Effects without changing any of your components.
+
+Similar to a design system, you might find it helpful to start extracting common idioms from your app’s components into custom Hooks. This will keep your components’ code focused on the intent, and let you avoid writing raw Effects very often. Many excellent custom Hooks are maintained by the React community.
 
 =>>>Deep Dive:
-Keep your custom Hooks focused on concrete high-level use cases 
+
+Will React provide any built-in solution for data fetching? 
 
 
-Start by choosing your custom Hook’s name. If you struggle to pick a clear name, it might mean that your Effect is too coupled to the rest of your component’s logic, and is not yet ready to be extracted.
 
-Ideally, your custom Hook’s name should be clear enough that even a person who doesn’t write code often could have a good guess about what your custom Hook does, what it takes, and what it returns:
+We’re still working out the details, but we expect that in the future, you’ll write data fetching like this:
 
-✅ useData(url)
-✅ useImpressionLog(eventName, extraData)
-✅ useChatRoom(options)
-When you synchronize with an external system, your custom Hook name may be more technical and use jargon specific to that system. It’s good as long as it would be clear to a person familiar with that system:
+import { use } from 'react'; // Not available yet!
 
-✅ useMediaQuery(query)
-✅ useSocket(url)
-✅ useIntersectionObserver(ref, options)
-Keep custom Hooks focused on concrete high-level use cases. Avoid creating and using custom “lifecycle” Hooks that act as alternatives and convenience wrappers for the useEffect API itself:
-
-🔴 useMount(fn)
-🔴 useEffectOnce(fn)
-🔴 useUpdateEffect(fn)
-For example, this useMount Hook tries to ensure some code only runs “on mount”:
-
-function ChatRoom({ roomId }) {
-  const [serverUrl, setServerUrl] = useState('https://localhost:1234');
-
-  // 🔴 Avoid: using custom "lifecycle" Hooks
-  useMount(() => {
-    const connection = createConnection({ roomId, serverUrl });
-    connection.connect();
-
-    post('/analytics/event', { eventName: 'visit_chat' });
-  });
-  // ...
-}
-
-// 🔴 Avoid: creating custom "lifecycle" Hooks
-function useMount(fn) {
-  useEffect(() => {
-    fn();
-  }, []); // 🔴 React Hook useEffect has a missing dependency: 'fn'
-}
-Custom “lifecycle” Hooks like useMount don’t fit well into the React paradigm. For example, this code example has a mistake (it doesn’t “react” to roomId or serverUrl changes), but the linter won’t warn you about it because the linter only checks direct useEffect calls. It won’t know about your Hook.
-
-If you’re writing an Effect, start by using the React API directly:
-
-function ChatRoom({ roomId }) {
-  const [serverUrl, setServerUrl] = useState('https://localhost:1234');
-
-  // ✅ Good: two raw Effects separated by purpose
-
-  useEffect(() => {
-    const connection = createConnection({ serverUrl, roomId });
-    connection.connect();
-    return () => connection.disconnect();
-  }, [serverUrl, roomId]);
-
-  useEffect(() => {
-    post('/analytics/event', { eventName: 'visit_chat', roomId });
-  }, [roomId]);
-
-  // ...
-}
-Then, you can (but don’t have to) extract custom Hooks for different high-level use cases:
-
-function ChatRoom({ roomId }) {
-  const [serverUrl, setServerUrl] = useState('https://localhost:1234');
-
-  // ✅ Great: custom Hooks named after their purpose
-  useChatRoom({ serverUrl, roomId });
-  useImpressionLog('visit_chat', { roomId });
-  // ...
-}
-A good custom Hook makes the calling code more declarative by constraining what it does. For example, useChatRoom(options) can only connect to the chat room, while useImpressionLog(eventName, extraData) can only send an impression log to the analytics. If your custom Hook API doesn’t constrain the use cases and is very abstract, in the long run it’s likely to introduce more problems than it solves.
+function ShippingForm({ country }) {
+  const cities = use(fetch(`/api/cities?country=${country}`));
+  const [city, setCity] = useState(null);
+  const areas = city ? use(fetch(`/api/areas?city=${city}`)) : null;
+  // ...}
   
+If you use custom Hooks like useData above in your app, it will require fewer changes to migrate to the eventually recommended approach than if you write raw Effects in every component manually. However, the old approach will still work fine, so if you feel happy writing raw Effects, you can continue to do that.
+
+There is more than one way to do it 
