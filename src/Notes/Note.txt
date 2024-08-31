@@ -163,5 +163,15 @@ The examples above assume that the fade-in logic needs to be written in JavaScri
   100% { opacity: 1; }
 }
 
+=>Recap:
+i.Custom Hooks let you share logic between components.
+ii.Custom Hooks must be named starting with use followed by a capital letter.
+iii.Custom Hooks only share stateful logic, not state itself.
+iv.You can pass reactive values from one Hook to another, and they stay up-to-date.
+v.All Hooks re-run every time your component re-renders.
+vi.The code of your custom Hooks should be pure, like your component’s code.
+vii.Wrap event handlers received by custom Hooks into Effect Events.
+viii.Don’t create custom Hooks like useMount. Keep their purpose specific.
+ix.It’s up to you how and where to choose the boundaries of your code.
 
 Note: The window.requestAnimationFrame() method tells the browser you wish to perform an animation. It requests the browser to call a user-supplied callback function before the next repaint.
