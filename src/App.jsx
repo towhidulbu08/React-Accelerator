@@ -16,10 +16,12 @@ function App() {
   }, []);
 
   const isEven = useMemo(() => {
+    console.time("Looping...");
     let i = 0;
     while (i < 1000000000) {
       i += 1;
     }
+    console.timeEnd("Looping...");
     return count1 % 2 === 0;
   }, [count1]);
   return (

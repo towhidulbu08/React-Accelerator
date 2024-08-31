@@ -1,94 +1,79 @@
-<==> 4.28 Performance Optimization <==>
+<==> 4.29 Performance Optimization More Example <==>
 
-=>>  Memoization is an optimization technique where the results of expensive function calls are cached, so that the same results can be returned quickly if the function is called again with the same inputs.
+=>>Caching expensive calculations:
 
-In React, this concept is commonly used with components or functions to avoid unnecessary re-renders and calculations.
+This component computes visibleTodos by taking the todos it receives by props and filtering them according to the filter prop. You might feel tempted to store the result in state and update it from an Effect:
 
-Example of "memorize" in React:
+function TodoList({ todos, filter }) {
+  const [newTodo, setNewTodo] = useState('');
 
-1.Using React.memo:
+  // 🔴 Avoid: redundant state and unnecessary Effect
+  const [visibleTodos, setVisibleTodos] = useState([]);
+  useEffect(() => {
+    setVisibleTodos(getFilteredTodos(todos, filter));
+  }, [todos, filter]);
 
-React.memo is a higher-order component that memoizes the rendered output of a functional component. If the component’s props don’t change, React will skip rendering the component again.
-
-Example:
-const MyComponent = React.memo(function MyComponent(props) {
-  // Render logic here
-});
-Bangla Explanation:
-
-React.memo এর মাধ্যমে কোনো কম্পোনেন্টের আউটপুট মুখস্থ করা হয়। যদি কম্পোনেন্টের প্রপসগুলো না বদলায়, তাহলে React পুনরায় কম্পোনেন্টটি রেন্ডার করা এড়িয়ে যায়।
-
-2.Using useMemo:
-
-useMemo is a React Hook that memoizes the result of a computation. It only re-computes the memoized value when one of the dependencies has changed.
-
-Example:
-
-
-const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);
-Bangla Explanation:
-
-useMemo ব্যবহার করে, React একটি ব্যয়বহুল গণনার ফলাফল মুখস্থ করে রাখে এবং নির্দিষ্ট ডিপেন্ডেন্সি পরিবর্তিত হলে তবেই তা পুনরায় গণনা করে।
-
-By memoizing in React, developers can optimize the performance of their applications by preventing unnecessary re-renders and calculations, especially in complex components or with expensive operations.
-
-3.Using useCallBack:
-
-In React, useCallback is a Hook that returns a memoized version of a callback function. It is useful when you want to ensure that a function maintains the same reference across renders, unless its dependencies change. This can help optimize the performance of your application, especially when passing callback functions to child components that might cause unnecessary re-renders.
-
-When to Use useCallback:
-When you have a function that is passed down to child components as a prop and you want to prevent those components from re-rendering unnecessarily.
-When you have a function that is used as a dependency in another Hook (e.g., useEffect or useMemo) and you want to ensure that it doesn't change unless its dependencies do.
-
-const memoizedCallback = useCallback(() => {
-  // Your logic here
-}, [dependency1, dependency2]);
-
-Example:
-j
-import React, { useState, useCallback } from 'react';
-
-function ParentComponent() {
-  const [count, setCount] = useState(0);
-
-  const increment = useCallback(() => {
-    setCount((prevCount) => prevCount + 1);
-  }, []);
-
-  return (
-    <div>
-      <ChildComponent increment={increment} />
-      <p>Count: {count}</p>
-      <button onClick={increment}>Increment</button>
-    </div>
-  );
+  // ...
 }
+Like in the earlier example, this is both unnecessary and inefficient. First, remove the state and the Effect:
 
-function ChildComponent({ increment }) {
-  console.log('ChildComponent rendered');
-  return (
-    <button onClick={increment}>Child Increment</button>
-  );
+function TodoList({ todos, filter }) {
+  const [newTodo, setNewTodo] = useState('');
+  // ✅ This is fine if getFilteredTodos() is not slow.
+  const visibleTodos = getFilteredTodos(todos, filter);
+  // ...
 }
-Explanation:
-Without useCallback: The increment function would be recreated on every render of ParentComponent, causing ChildComponent to re-render each time, even if it didn’t need to.
+Usually, this code is fine! But maybe getFilteredTodos() is slow or you have a lot of todos. In that case you don’t want to recalculate getFilteredTodos() if some unrelated state variable like newTodo has changed.
 
-With useCallback: The increment function is memoized, meaning it will only be recreated if the dependencies change. Since the dependencies array is empty ([]), the increment function will maintain the same reference across renders, preventing unnecessary re-renders of ChildComponent.
+You can cache (or “memoize”) an expensive calculation by wrapping it in a useMemo Hook:
 
-Bangla Explanation:
-useCallback হল একটি React Hook যা একটি কলব্যাক ফাংশনের মুখস্থ সংস্করণ ফেরত দেয়। এটি তখনই পুনরায় তৈরি হয় যখন নির্দিষ্ট ডিপেন্ডেন্সিগুলি পরিবর্তিত হয়।
-আপনি যখন একটি ফাংশনকে শিশু কম্পোনেন্টে প্রপ হিসেবে পাঠান এবং চান যে প্রপের কারণে অপ্রয়োজনীয়ভাবে শিশু কম্পোনেন্টটি পুনরায় রেন্ডার না হয়, তখন useCallback ব্যবহার করা হয়।
-উদাহরণ:
+import { useMemo, useState } from 'react';
 
-useCallback ছাড়া: প্রতিবার ParentComponent রেন্ডার হলে increment ফাংশনটি নতুন করে তৈরি হবে, যার ফলে ChildComponent অপ্রয়োজনীয়ভাবে পুনরায় রেন্ডার হবে।
-useCallback সহ: increment ফাংশনটি মুখস্থ থাকে এবং নির্দিষ্ট ডিপেন্ডেন্সি পরিবর্তিত না হলে পুনরায় তৈরি হয় না, ফলে ChildComponent অপ্রয়োজনীয়ভাবে পুনরায় রেন্ডার হয় না।
+function TodoList({ todos, filter }) {
+  const [newTodo, setNewTodo] = useState('');
+  const visibleTodos = useMemo(() => {
+    // ✅ Does not re-run unless todos or filter change
+    return getFilteredTodos(todos, filter);
+  }, [todos, filter]);
+  // ...
+}
+Or, written as a single line:
+
+import { useMemo, useState } from 'react';
+
+function TodoList({ todos, filter }) {
+  const [newTodo, setNewTodo] = useState('');
+  // ✅ Does not re-run getFilteredTodos() unless todos or filter change
+  const visibleTodos = useMemo(() => getFilteredTodos(todos, filter), [todos, filter]);
+  // ...
+}
+This tells React that you don’t want the inner function to re-run unless either todos or filter have changed. React will remember the return value of getFilteredTodos() during the initial render. During the next renders, it will check if todos or filter are different. If they’re the same as last time, useMemo will return the last result it has stored. But if they are different, React will call the inner function again (and store its result).
+
+The function you wrap in useMemo runs during rendering, so this only works for pure calculations.
+
+=>>Deep Dive:
+
+How to tell if a calculation is expensive? 
 
 
->>Note:In programming, memoize (or memoization) refers to an optimization technique used to speed up programs by storing the results of expensive function calls and reusing those results when the same inputs occur again. Instead of recalculating the result each time, the function retrieves the stored result, which can significantly improve performance, especially for functions that are called frequently with the same inputs.
+In general, unless you’re creating or looping over thousands of objects, it’s probably not expensive. If you want to get more confidence, you can add a console log to measure the time spent in a piece of code:
 
+console.time('filter array');
+const visibleTodos = getFilteredTodos(todos, filter);
+console.timeEnd('filter array');
 
+Perform the interaction you’re measuring (for example, typing into the input). You will then see logs like filter array: 0.15ms in your console. If the overall logged time adds up to a significant amount (say, 1ms or more), it might make sense to memoize that calculation. As an experiment, you can then wrap the calculation in useMemo to verify whether the total logged time has decreased for that interaction or not:
 
+console.time('filter array');
+const visibleTodos = useMemo(() => {
+  return getFilteredTodos(todos, filter); // Skipped if todos and filter haven't changed
+}, [todos, filter]);
+console.timeEnd('filter array');
+useMemo won’t make the first render faster. It only helps you skip unnecessary work on updates.
 
+Keep in mind that your machine is probably faster than your users’ so it’s a good idea to test the performance with an artificial slowdown. For example, Chrome offers a CPU Throttling option for this.
+
+Also note that measuring performance in development will not give you the most accurate results. (For example, when Strict Mode is on, you will see each component render twice rather than once.) To get the most accurate timings, build your app for production and test it on a device like your users have.
 
 
 
