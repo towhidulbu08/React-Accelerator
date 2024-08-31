@@ -1,42 +1,46 @@
 import { useEffect } from "react";
+import { FadeInAnimation } from "./animation";
 
 export default function useFadeInAnimation(ref, duration) {
   useEffect(() => {
-    const node = ref.current;
-    let startTime = performance.now();
-    let frameId = null;
+    const animation = new FadeInAnimation(ref.current);
+    animation.start(duration);
+    return () => {
+      animation.stop();
+    };
 
-    function onFrame(now) {
-      const timePassed = now - startTime;
-      const progress = Math.min(timePassed / duration, 1);
+    // const node = ref.current;
+    // let frameId = null;
+    // let startTime = performance.now();
 
-      onProgress(progress);
+    // function onProgress(progress) {
+    //   node.style.opacity = progress;
+    // }
 
-      if (progress < 1) {
-        console.log(progress);
+    // function onFrame(now) {
+    //   let timePassed = now - startTime;
+    //   const progress = Math.min(timePassed / duration, 1);
+    //   onProgress(progress);
+    //   if (progress < 1) {
+    //     frameId = requestAnimationFrame(onFrame);
+    //   }
+    // }
+    // function start() {
+    //   onProgress(0);
+    //   startTime = performance.now();
+    //   frameId = requestAnimationFrame(onFrame);
+    // }
 
-        frameId = requestAnimationFrame(onFrame);
-      }
-    }
+    // function stop() {
+    //   cancelAnimationFrame(frameId);
+    //   frameId = null;
+    //   startTime = null;
+    // }
 
-    function onProgress(progress) {
-      node.style.opacity = progress;
-    }
+    // start();
 
-    function start() {
-      onProgress(0);
-      startTime = performance.now();
-      frameId = requestAnimationFrame(onFrame);
-    }
-
-    function stop() {
-      cancelAnimationFrame(frameId);
-      startTime = null;
-      frameId = null;
-    }
-
-    start();
-
-    return () => stop();
+    // return () => {
+    //   stop();
+    // };
   }, [ref, duration]);
 }

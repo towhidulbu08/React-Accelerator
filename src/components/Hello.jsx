@@ -1,14 +1,10 @@
-import { useRef } from "react";
-import useFadeInAnimation from "../hooks/useFadeInAnimation";
+// import useFadeInAnimation from "../hooks/useFadeInAnimation";
+import "../App.css";
 
 export default function Hello() {
-    const ref = useRef(null);
+  // const ref = useRef(null);
 
-    useFadeInAnimation(ref, 3000);
+  // useFadeInAnimation(ref, 3000);
 
-    return (
-        <div className="welcome" ref={ref}>
-            Hello
-        </div>
-    );
+  return <div className="welcome">Hello</div>;
 }

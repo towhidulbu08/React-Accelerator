@@ -56,7 +56,6 @@ body {
   min-height: 300px;
 }
 .welcome {
-  opacity: 1;
   color: white;
   padding: 50px;
   text-align: center;
@@ -66,4 +65,15 @@ body {
     rgba(63, 94, 251, 1) 0%,
     rgba(252, 70, 107, 1) 100%
   );
+
+  animation: fadeIn 3000ms;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
