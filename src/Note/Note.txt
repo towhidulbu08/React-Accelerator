@@ -1,0 +1,95 @@
+<=>L-5.2 API Request with Axios in React<=>
+
+1. Learn CRUD operations with Axios 
+2. Difference Between PUT and PATCH:
+   PUT: Replaces the entire resource with the new data.
+   PATCH: Updates only the specified fields, leaving the rest unchanged.
+
+3. Base Url 
+4. Difference Between fetch api vs axios.
+5. using interceptor with axios.
+6. MiddleWare:In JavaScript, middleware refers to functions that sit between the request and response in an application, usually in a web server or framework context (like Express.js). Middleware functions can modify the request or response objects, perform tasks like logging, authentication, data validation, etc., and control the flow of the application.
+
+=>Key Concepts of Middleware:
+1.Middleware Function: A middleware function is simply a function that receives three arguments: request (req), response (res), and next. It can inspect, modify, or terminate a request before passing it to the next middleware in the chain:
+
+example:
+  function myMiddleware(req, res, next) {
+  // Do something with the request or response
+  console.log('Request URL:', req.url);
+  
+  // Call next to pass control to the next middleware
+  next();
+}
+
+2.req, res, next:
+
+req: The request object, which contains details about the incoming HTTP request (e.g., headers, body, URL).
+
+res: The response object, used to send data back to the client.
+
+next: A function that passes control to the next middleware function. If next() is not called, the request will hang.
+
+3.Chaining: Multiple middleware functions can be chained together. Each middleware can process the request, modify it, or respond to it. The chain is processed in order until one middleware function sends a response or stops the chain.
+
+example:
+app.use(middleware1);
+app.use(middleware2);
+
+4.Types of Middleware:
+
+1.Application-level Middleware: Defined and used in the application directly, often using app.use().
+2.Router-level Middleware: Middleware that applies to specific routes.
+3.Error-handling Middleware: Special middleware for catching and responding to errors.
+4.Built-in Middleware: Provided by frameworks (like Express.js) for common tasks such as serving static files or parsing request bodies.
+5.Third-party Middleware: Packages you can install to add functionality (e.g., body-parser, cors).
+
+Example of Middleware in Express.js:
+
+const express = require('express');
+const app = express();
+
+// Middleware function to log request details
+function logger(req, res, next) {
+  console.log(`${req.method} ${req.url}`);
+  next(); // Pass control to the next middleware
+}
+
+// Use the middleware
+app.use(logger);
+
+// Route handler
+app.get('/', (req, res) => {
+  res.send('Hello World');
+});
+
+app.listen(3000, () => console.log('Server running on port 3000'));
+
+In this example:
+
+The logger middleware logs the HTTP method and URL of each request.
+After logging, it calls next() to pass control to the next middleware or route handler.
+
+=>How Middleware Works:
+Middleware functions are executed in the order they are added. For instance:
+
+1.A request comes in.
+2.The first middleware function is executed.
+3.The next() function is called.
+4.The second middleware function is executed, and so on.
+5.If a middleware sends a response, the cycle ends.
+
+=>Use Cases of Middleware:
+1.Authentication and Authorization: Verifying if a user is authenticated before granting access to certain routes.
+2.Request Validation: Checking the validity of request data (e.g., verifying input types).
+3.Logging: Logging requests, responses, or errors.
+4.Session Management: Handling sessions, cookies, or tokens.
+5.Error Handling: Catching and responding to errors consistently across the application.
+
+==> Summery:Middleware is a powerful and flexible pattern in JavaScript frameworks, particularly in Express.js, for handling cross-cutting concerns like authentication, logging, and error handling.
+
+
+
+
+
+
