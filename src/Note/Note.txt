@@ -1,0 +1,11 @@
+<==> 5.3 React Query Crash Course <==>
+
+1. Learning Mutation (CRUD Operation) Using useMutation Hooks.
+2. useQuery returns an object and receive also an object as parameter which includes queryKey , queryFn
+3. React Query Devtools
+4. Caching data using useQuery hooks.
+5.Pagination using useQuery hooks
+6.If we use useQuery , we don't need to use useEffect for data fetching
+Note: React Query wont work on data fetching from server. We will use fetch api or axios for that purpose. React Query work after data fetching from server.
+
+==>Both useQuery and useMutation returns an object and receive an object also.

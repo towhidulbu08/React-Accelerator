@@ -1,38 +1,45 @@
-import React from 'react'
-
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import React from "react";
 
-const retrieveProduct = async({queryKey}) => {
-    const response = await axios.get(`http://localhost:3000/${queryKey[0]}/${queryKey[1]}`);
-    return response.data;
-}
+const retrievedProduct = async ({ queryKey }) => {
+  const response = await axios.get(
+    `http://localhost:3000/${queryKey[0]}/${queryKey[1]}`
+  );
 
-const ProductDetails = ({id}) => {
+  return response.data;
+};
 
- const {data: product, error, isLoading } = useQuery({
+const ProductDetails = ({ id }) => {
+  const {
+    data: product,
+    error,
+    isLoading,
+  } = useQuery({
     queryKey: ["products", id],
-    queryFn: retrieveProduct,
+    queryFn: retrievedProduct,
   });
+  // console.log(product);
 
-  if (isLoading) return <div>Fetching Product Details...</div>
-  if(error) return <div>An Error Occured: {error.message}</div>
+  if (isLoading) return <div>Fetching Products...</div>;
+  if (error) return <div> An Error Ocurred:{error.message}</div>;
 
   return (
-    <div className='w-1/5'>
-        <h1 className="text-3xl my-2">Product Details</h1>
-        <div className='border bg-gray-100 p-1 text-md rounded flex flex-col'>
-            <img
-                src={product.thumbnail}
-                alt={product.title}
-                className="object-cover h-24 w-24 border rounded-full m-auto" />
-            <p>{product.title}</p>
-            <p>{product.description}</p>
-            <p>USD {product.price}</p>
-            <p>{product.rating}/5</p>
-        </div>
+    <div className="w-1/5">
+      <h1 className="text-3xl my-2">Product Details</h1>
+      <div className="border bg-violet-400 p-1 text-md rounded flex flex-col">
+        <img
+          src={product.thumbnail}
+          alt={product.title}
+          className="object-cover h-24 w-24  border rounded-full m-auto"
+        />
+        <p>{product.title}</p>
+        <p>{product.description}</p>
+        <p>USD {product.price}</p>
+        <p>{product.rating}/5</p>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default ProductDetails
+export default ProductDetails;
