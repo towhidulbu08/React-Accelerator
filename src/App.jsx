@@ -1,14 +1,14 @@
-import LoginForm from "./forms/LoginForm"
-import RegistrationForm from "./forms/RegistrationForm"
+//import LoginForm from "./forms/LoginForm";
+import RegistrationForm from "./forms/RegistrationForm";
 
 function App() {
-
   return (
     <>
-      {/*<LoginForm />*/}
+      {/* <LoginForm /> */}
       <RegistrationForm />
+      {/* <div>Hello React Hook Form</div> */}
     </>
-  )
+  );
 }
 
-export default App
+export default App;

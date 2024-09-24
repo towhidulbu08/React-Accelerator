@@ -1,0 +1,5 @@
+<==> React Hook Form Crash Course <==>
+
+1. How to validate , read, update  form data without  using useState Hook
+2. How to Add Dynamic Form
+3. use cases of useForm hook, useFieldArray hook and Controller component
