@@ -1,0 +1,138 @@
+        <==>L-5.7:Animation In React With Framer Motion <==>
+
+
+Note: Basics Css Animation Property:
+
+
+1.animation: Shorthand for all animation properties.
+2.@keyframes: Defines the stages of the animation.
+3.animation-name: Specifies the keyframes to use.
+4.animation-duration: Time taken to complete the animation cycle.
+5.animation-timing-function: Controls the speed curve of the animation.
+6.animation-delay: Delays the start of the animation.
+7.animation-iteration-count: Number of times the animation runs.
+8.animation-direction: Direction of the animation cycle.
+9.animation-fill-mode: Defines the styles applied before/after animation.
+10.animation-play-state: Pauses or resumes the animation.
+
+==>Framer Motion is a popular animation library built for React that enables developers to create complex and performant animations with minimal effort. It provides a declarative API for animations and transitions, allowing you to easily animate components, gestures, layout changes, and more. Key features include:
+
+1.Ease of Use: Framer Motion simplifies adding animations with props like animate, initial, and exit, making it highly intuitive.
+
+2.Animation Types:
+
+  i.Keyframe Animations: Use animate with arrays to create keyframe-based animations.
+  ii.Transitions: Control timing, easing, and delay using the transition prop.
+
+3.Gestures: Framer Motion supports animations triggered by gestures like drag, hover, and tap.
+
+4.Variants: These allow defining a set of animation states that can be reused for multiple components.
+
+5.Layout Animations: Components animate smoothly when their layout changes, ideal for UI elements that shift dynamically.
+
+6.Performance: Built on the requestAnimationFrame loop, it optimizes performance, especially in terms of smoothness and responsiveness.
+
+
+
+
+
+
+==>In Framer Motion, props are used to define how a component should behave in terms of animation, gestures, and layout changes. Since it's built on React, Framer Motion components accept a variety of props to control animations and interactions. Let's break down some of the key props used in Framer Motion:
+
+1. animate
+This prop defines the final state of the animation. It's the state the component will animate towards.
+It can be an object (for single state animations) or an array (for keyframe animations).
+Example:
+
+<motion.div animate={{ x: 100, opacity: 1 }} />
+
+2. initial
+Defines the initial state of the component before the animation starts.
+Example:
+
+<motion.div initial={{ x: 0, opacity: 0 }} animate={{ x: 100, opacity: 1 }} />
+
+3. exit
+Defines the exit animation when the component is removed from the DOM. This is especially useful for animating components during page transitions or conditional rendering.
+Example:
+
+<motion.div exit={{ opacity: 0 }} />
+
+4. transition
+Controls the timing and easing of the animation. You can specify things like duration, delay, ease, and more.
+Example:
+
+<motion.div 
+  animate={{ x: 100 }} 
+  transition={{ duration: 0.5, ease: "easeInOut" }} 
+/>
+5. whileHover:
+Triggers an animation when the user hovers over the component.
+Example:
+
+<motion.div whileHover={{ scale: 1.2 }} />
+6. whileTap:
+Triggers an animation when the user taps (or clicks) the component.
+Example:
+
+<motion.div whileTap={{ scale: 0.8 }} />
+7. drag:
+Enables drag functionality for the component. You can specify which axis the component can be dragged along (x, y, or both).
+Example:
+
+<motion.div drag="x" />
+8. layout:
+Used to animate layout changes automatically when the component’s size or position changes due to React's re-renders.
+Example:
+
+<motion.div layout />
+
+9. variants:
+This prop defines multiple states (or variations) of an animation and allows for easier reuse. You can define initial, animate, and exit states inside a single variants object and then assign the states to components.
+Example:
+
+const boxVariants = {
+  hidden: { opacity: 0, x: -100 },
+  visible: { opacity: 1, x: 0 }
+};
+
+<motion.div initial="hidden" animate="visible" variants={boxVariants} />
+
+Example Code with Multiple Props:
+
+import { motion } from "framer-motion";
+
+const Example = () => {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.9 }}
+      transition={{ duration: 0.5 }}
+    >
+      Hover or Tap me!
+    </motion.div>
+  );
+};
+==>Recap of Key Props:
+
+1.animate: Defines the target state of the animation.
+2.initial: Specifies the initial state before the animation starts.
+3.exit: Defines the animation when the component is removed.
+4.transition: Controls the timing and easing of animations.
+5.whileHover / whileTap: Animates the component when hovered or tapped.
+6.drag: Enables draggable behavior.
+7.layout: Smoothly animates layout changes.
+8.variants: Helps define reusable animation states.
+
+Each of these props helps build complex and responsive animations in a declarative and readable way. Would you like to explore any of these props further with specific examples or use cases?
+
+
+
+
+
+
+
+
