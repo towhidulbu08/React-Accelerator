@@ -1,7 +1,7 @@
 import { useDebugValue, useState } from "react";
 
-export function useStateDisplayName(initialValue, displayName) {
-    const [value, setValue] = useState(initialValue);
-    useDebugValue(`${displayName} for ${initialValue}`);
-    return [value, setValue];
+export default function useStateDisplayName(initialValue, displayName) {
+  const [value, setValue] = useState(initialValue);
+  useDebugValue(`${displayName} for ${initialValue}`);
+  return [value, setValue];
 }
