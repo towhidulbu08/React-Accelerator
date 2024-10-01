@@ -1,3 +1,3 @@
 export default function Title({ className, text }) {
-    return <span className={className}>{text}</span>;
+  return <span className={className}>{text}</span>;
 }
