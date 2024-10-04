@@ -1,0 +1,196 @@
+             <==>L-5.13 React-Redux Crash Course<==>
+
+React-Redux সম্পর্কে পূর্ণাঙ্গ নোটস:
+১. React-Redux কী?
+React-Redux হলো একটি লাইব্রেরি যা React এবং Redux-এর মধ্যে সংযোগ স্থাপন করে। এটি Redux state management ব্যবস্থাকে React অ্যাপ্লিকেশনের সাথে সহজভাবে সংযুক্ত করতে সাহায্য করে। React-Redux ব্যবহার করলে global state management (একটি কেন্দ্রীয় স্থানে state সংরক্ষণ করা) অনেক বেশি সংগঠিত ও কার্যকরী হয়।
+
+২. Redux-এর মূল ধারণা:
+
+Redux তিনটি মূল অংশের উপর ভিত্তি করে কাজ করে:
+
+A.State: এটি হলো অ্যাপ্লিকেশনের সম্পূর্ণ ডেটার representation। এটি একটি জাভাস্ক্রিপ্ট অবজেক্টের মতো যেখানে অ্যাপ্লিকেশনের সব state সংরক্ষণ করা হয়।
+
+B.Action: এটি হলো একটি জাভাস্ক্রিপ্ট অবজেক্ট যা state পরিবর্তনের জন্য ব্যবহৃত হয়। Action-এ দুইটি অংশ থাকে:
+      i.type: পরিবর্তনের ধরন নির্দেশ করে।
+      ii.payload: অতিরিক্ত তথ্য, যা state পরিবর্তনে প্রয়োজন।
+C.Reducer: এটি হলো একটি function, যা state এবং action নিয়ে কাজ করে এবং নতুন state রিটার্ন করে। এটি state এবং action এর উপর নির্ভর করে কীভাবে state পরিবর্তন হবে তা সংজ্ঞায়িত করে।
+
+৩. Redux-এর গুরুত্বপূর্ণ বৈশিষ্ট্য:
+
+i.Single Source of Truth: সম্পূর্ণ অ্যাপ্লিকেশনের state একটি কেন্দ্রীয় স্থানে (store) সংরক্ষণ করা হয়।
+ii.State is Read-Only: সরাসরি state পরিবর্তন করা যায় না। শুধুমাত্র action পাঠিয়েই state পরিবর্তন করা যায়।
+iii.Changes are Made with Pure Functions: Reducer হল pure function, যা একই ইনপুট পেলে সবসময় একই আউটপুট প্রদান করে।
+
+৪. Redux-এ State Flow (Data Flow):
+Redux-এ ডেটা ফ্লো unidirectional (একপথে) হয়। অর্থাৎ, ডেটা একটি নির্দিষ্ট পথ অনুসরণ করে:
+
+i.Action Dispatch করা হয়।
+ii.Reducer action এর উপর ভিত্তি করে নতুন state প্রদান করে।
+iii.Store নতুন state-কে update করে।
+iv.React Components store থেকে নতুন state পায় এবং সেই অনুযায়ী UI update করে।
+
+৫. React-Redux এর গুরুত্বপূর্ণ Components
+React-Redux মূলত দুটি কম্পোনেন্ট দিয়ে কাজ করে:
+
+i.Provider: এটি হলো একটি React কম্পোনেন্ট যা সম্পূর্ণ অ্যাপ্লিকেশনকে Redux store অ্যাক্সেস দেয়। সাধারণত index.js-এ ব্যবহৃত হয়। উদাহরণস্বরূপ:
+
+import { Provider } from 'react-redux';
+import { store } from './store';
+
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+);
+
+ii.Connect: এটি হলো একটি HOC (Higher Order Component) যা React কম্পোনেন্টকে Redux store-এর state এবং dispatch method-এর সাথে সংযুক্ত করে। এর জন্য mapStateToProps এবং mapDispatchToProps function প্রয়োজন হয়।
+
+৬. mapStateToProps এবং mapDispatchToProps:
+mapStateToProps: এটি state কে props হিসেবে কম্পোনেন্টে প্রদান করে।
+mapDispatchToProps: এটি action dispatch করার জন্য props হিসেবে function প্রদান করে।
+উদাহরণ:
+
+
+const mapStateToProps = (state) => {
+  return {
+    count: state.count,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    increment: () => dispatch({ type: 'INCREMENT' }),
+    decrement: () => dispatch({ type: 'DECREMENT' }),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CounterComponent);
+
+৭. React-Redux Hook API:
+Redux-এর নতুন ভার্সনে React-Redux hooks ব্যবহার করার সুবিধা দেয়। এর মাধ্যমে Redux state এবং dispatch সরাসরি component-এ ব্যবহার করা যায়। উল্লেখযোগ্য hooks:
+
+i.useSelector(): এটি Redux store থেকে state রিড করতে ব্যবহৃত হয়।
+ii.useDispatch(): এটি action dispatch করার জন্য ব্যবহৃত হয়।
+উদাহরণ:
+
+
+import { useSelector, useDispatch } from 'react-redux';
+
+const CounterComponent = () => {
+  const count = useSelector((state) => state.count);
+  const dispatch = useDispatch();
+
+  return (
+    <div>
+      <h2>Count: {count}</h2>
+      <button onClick={() => dispatch({ type: 'INCREMENT' })}>Increase</button>
+      <button onClick={() => dispatch({ type: 'DECREMENT' })}>Decrease</button>
+    </div>
+  );
+};
+
+৮. Redux Store তৈরি ও ব্যবহারের ধাপ:
+
+i.Action তৈরি:
+
+export const increment = () => {
+  return {
+    type: 'INCREMENT',
+  };
+};
+
+ii.Reducer তৈরি:
+
+const initialState = {
+  count: 0,
+};
+
+const counterReducer = (state = initialState, action) => {
+  switch (action.type) {
+    case 'INCREMENT':
+      return { count: state.count + 1 };
+    case 'DECREMENT':
+      return { count: state.count - 1 };
+    default:
+      return state;
+  }
+};
+
+export default counterReducer;
+
+iii.Redux Store তৈরি:
+
+import { createStore } from 'redux';
+import counterReducer from './reducer';
+
+const store = createStore(counterReducer);
+export default store;
+
+iv.React-Redux ব্যবহার:
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import store from './store';
+import App from './App';
+
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root')
+);
+
+৯. Redux Middleware:
+Middleware হল এমন কিছু ফাংশন যা Redux store-এর dispatch() method এবং reducer-এর মধ্যে কার্য সম্পন্ন করে। এটি মূলত ডেটা লগিং, API কল বা async action (যেমন redux-thunk ব্যবহার করে) ব্যবহারের জন্য উপযোগী।
+
+
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+import rootReducer from './reducers';
+
+const store = createStore(rootReducer, applyMiddleware(thunk));
+
+১০. Redux Toolkit (RTK):
+Redux Toolkit হলো Redux-এর জন্য একটি নতুন অফিসিয়াল লাইব্রেরি, যা Redux setup এবং configuration সহজ করে। RTK ব্যবহার করে slice তৈরি করা এবং state management করা অনেক সহজ হয়ে যায়।
+
+
+import { configureStore, createSlice } from '@reduxjs/toolkit';
+
+// Slice তৈরি
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState: { count: 0 },
+  reducers: {
+    increment: (state) => {
+      state.count += 1;
+    },
+    decrement: (state) => {
+      state.count -= 1;
+    },
+  },
+});
+
+// Store তৈরি
+const store = configureStore({
+  reducer: counterSlice.reducer,
+});
+
+export default store;
+export const { increment, decrement } = counterSlice.actions;
+
+উপসংহার:
+React-Redux React অ্যাপ্লিকেশনে state management এর জন্য একটি শক্তিশালী সমাধান প্রদান করে। Redux এবং React-Redux-এর মূল কনসেপ্টগুলো যেমন Action, Reducer, Store, এবং Hook API বুঝতে পারলে, বড় মাপের অ্যাপ্লিকেশনগুলো খুব সহজেই পরিচালনা করা যায়।
+
+
+
+
+
+
+
+
+
+
+
+
